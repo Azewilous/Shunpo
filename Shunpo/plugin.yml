@@ -1,0 +1,17 @@
+name: Shunpo
+version: 1.2
+description: A Player Versus Player Plugin Where You Can Right Click A Sword To Teleport Behind A Player.
+
+author: Azewilous
+
+main: me.azewilous.shunpo.Shunpo
+
+commands:
+   shreload:
+     description: Reloads The Shunpo Plugin.
+     usage: /shreload
+
+permissions:
+   shunpo.use:
+     description: Allows The Player To Use The Shunpo Event.
+     default: false
