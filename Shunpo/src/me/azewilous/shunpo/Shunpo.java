@@ -1,5 +1,6 @@
 package me.azewilous.shunpo;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -7,8 +8,8 @@ import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -16,16 +17,22 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Shunpo extends JavaPlugin implements Listener{
 
+Plugin plugin;
+	
 	public final Logger azelogs = Logger.getLogger(getName());
 	
 	public HashMap<Player, Integer> cooldownTime;
 	public HashMap<Player, BukkitRunnable> cooldownTask;
+	
+	FileConfiguration config;
+	File cFile;
 	
 	@Override 
 	public void onEnable(){
@@ -33,7 +40,13 @@ public class Shunpo extends JavaPlugin implements Listener{
 		this.azelogs.info(pdf.getName() + "- Version -" + pdf.getVersion());
 		getServer().getPluginManager().registerEvents(this, this);
 		
-		this.saveDefaultConfig();
+		config = getConfig();
+		config.options().copyDefaults(true);
+		cFile = new File(getDataFolder(), "config.yml");
+		
+		config.addDefault("Shunpo.Material", 276);
+		config.addDefault("Shunpo.Cooldown", 5);
+		saveConfig();
 		
 		azelogs.info(this + "Config Has Been Loaded!");
 		
@@ -41,7 +54,6 @@ public class Shunpo extends JavaPlugin implements Listener{
 		cooldownTask = new HashMap<Player, BukkitRunnable>();
 	
 		this.getCommand("shreload").setExecutor(new Reload(this));
-		
 	}
 
 	@Override
@@ -55,7 +67,9 @@ public class Shunpo extends JavaPlugin implements Listener{
     public boolean swrodTeleEvent(PlayerInteractEvent event) {
 	    Player player = (Player) event.getPlayer();
 		
-        if((player.getItemInHand().getType() == Material.DIAMOND_SWORD) && (player.hasPermission("shunpo.use") || player.isOp())){
+	    
+	    
+        if((player.getItemInHand().getType().getId() == this.getConfig().getInt("Shunpo.Material")) && (player.hasPermission("shunpo.use") || player.isOp())){
         	if(cooldownTime.containsKey(player)){
         		player.sendMessage(ChatColor.RED + "You must wait for " + cooldownTime.get(player) + " seconds.");
         		return true;
@@ -70,7 +84,7 @@ public class Shunpo extends JavaPlugin implements Listener{
         				player.playEffect(loc, Effect.EXTINGUISH, 100);
         				player.playSound(loc, Sound.DIG_GRASS, 10, 0.5f);
         				
-        				cooldownTime.put(player, this.getConfig().getInt("Cooldown", 5));
+        				cooldownTime.put(player, this.getConfig().getInt("Shunpo.Cooldown"));
                         cooldownTask.put(player, new BukkitRunnable() {
                                 public void run() {
                                         cooldownTime.put(player, cooldownTime.get(player) - 1);

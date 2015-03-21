@@ -21,6 +21,8 @@ Shunpo plugin;
 		if(args.length == 0){
 			if(sender.hasPermission("sh.reload") || sender.isOp()){
 			plugin.reloadConfig();
+			plugin.getPluginLoader().disablePlugin(plugin);
+			plugin.getPluginLoader().enablePlugin(plugin);
 			Bukkit.broadcastMessage(ChatColor.BOLD + "The Plguin " + plugin + " Has Been Reloaded");
 		} else {
 			sender.sendMessage(ChatColor.DARK_RED + "Too Many Arguments");
